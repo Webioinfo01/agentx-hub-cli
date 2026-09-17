@@ -2,6 +2,10 @@
 
 ## v0.1.2
 
+Final release — the package is deprecated; the registry commands now live
+in [awescholar](https://github.com/wehuman01/awescholar) (see the README
+deprecation notice).
+
 Batch intake from the literature pipeline, and an explicit awescholar
 compatibility gate.
 
