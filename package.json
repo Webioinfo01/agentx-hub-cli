@@ -1,6 +1,6 @@
 {
   "name": "agentx-hub-cli",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Standalone CLI for the AgentX research-agent registry: add agents, refresh GitHub metrics, and validate the registry snapshot.",
   "license": "MPL-2.0",
   "type": "module",

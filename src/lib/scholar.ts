@@ -5,11 +5,21 @@ import { execFile } from "node:child_process";
 import { readFile, stat } from "node:fs/promises";
 import { promisify } from "node:util";
 
+import { CliError } from "./cli-error";
+
 const run = promisify(execFile);
 
 // Semantic Scholar resolves one identifier per API call at roughly 10s each
 // on the shared pool — larger batches blow past the per-call exec timeout.
 const CHUNK = 10;
+
+// Compatibility is detected by output shape, not version strings: awescholar
+// >= 0.2.2 always writes these keys on every search record (values may be
+// empty/null), older versions omit them entirely and downstream data would
+// silently degrade.
+const REQUIRED_KEYS = ["authors", "citations"] as const;
+
+const UPGRADE_HINT = 'pip install -U "awescholar>=0.2.2"';
 
 /** One awescholar record as written by `updater search --json-file`. */
 export interface ScholarRecord {
@@ -48,7 +58,7 @@ export async function awescholarSearch(
       { timeout: 300_000 },
     ).catch((err) => {
       if (err.code === "ENOENT") {
-        throw new Error("awescholar CLI not found — install with `pip install awescholar`");
+        throw new CliError(`awescholar CLI not found on PATH — install it with \`${UPGRADE_HINT}\``);
       }
       throw err;
     });
@@ -58,7 +68,18 @@ export async function awescholarSearch(
     );
     if (exists) {
       const raw = JSON.parse(await readFile(chunkFile, "utf8")) as unknown;
-      if (Array.isArray(raw)) records.push(...(raw as ScholarRecord[]));
+      if (Array.isArray(raw)) {
+        const missing = REQUIRED_KEYS.filter((key) =>
+          (raw as Record<string, unknown>[]).some((r) => !(key in r)),
+        );
+        if (missing.length > 0) {
+          throw new CliError(
+            `awescholar search records lack the ${missing.map((k) => `\`${k}\``).join(" and ")} field — ` +
+              `the installed awescholar is too old. Upgrade with \`${UPGRADE_HINT}\``,
+          );
+        }
+        records.push(...(raw as ScholarRecord[]));
+      }
     }
   }
   return records;

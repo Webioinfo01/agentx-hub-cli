@@ -64,6 +64,18 @@ agentx add owner/repo --category bio-omics --tags "Stanford,Nature-Biotechnology
 `agentx add` 校验分类和标签政策，要求仓库在 GitHub 上存在，抓取一次实时
 指标，按稳定 slug 顺序追加记录。之后运行 `agentx validate`，再提交快照。
 
+从文献流水线批量录入时，`awescholar render agentx` 会把带 GitHub 仓库的
+论文导出为候选文件，用下面的命令摄入：
+
+```bash
+agentx add --from-json candidates.json
+# Added 3 agents from candidates.json: ...
+```
+
+候选文件是数据而不是决定：每条记录都走同样的分类/标签校验和一次实时
+GitHub 拉取（文件里的陈旧指标一律忽略），已注册的仓库跳过并提示，整批
+all-or-nothing——任何一条新记录不过，就什么都不写。
+
 ## 配置
 
 没有配置文件。选项来自命令行标志和环境变量：
@@ -72,7 +84,7 @@ agentx add owner/repo --category bio-omics --tags "Stanford,Nature-Biotechnology
 |---|---|---|
 | `GITHUB_TOKEN` | `add`、`snapshot` | GitHub API 限额从 60 提到 5,000 次/小时 |
 | `SEMANTICSCHOLAR_API_KEY` | `enrich-papers`、`refresh-citations` | 避开 Semantic Scholar 匿名限流 |
-| PATH 上的 `awescholar` | `snapshot`、`enrich-papers`、`refresh-citations` | 批量 GitHub 刷新和论文查询（`pip install awescholar`） |
+| PATH 上的 `awescholar`（>= 0.2.2） | `snapshot`、`enrich-papers`、`refresh-citations` | 批量 GitHub 刷新和论文查询（`pip install -U "awescholar>=0.2.2"`）；过旧的安装会被输出形状检查拒绝 |
 
 所有命令都接受 `--root <dir>`——目标 AgentX 仓库，默认当前目录。
 
@@ -81,6 +93,7 @@ agentx add owner/repo --category bio-omics --tags "Stanford,Nature-Biotechnology
 ```bash
 agentx add owner/repo --category <slug> [--name "Foo"] [--tags "A,B"]
 agentx add owner/repo --paper <url> [--homepage <url>] [--description "txt"]
+agentx add --from-json <awescholar render agentx 导出的 candidates.json>
 agentx validate
 agentx snapshot
 agentx enrich-papers [--force] [--only <slug-substring>]

@@ -53,8 +53,19 @@ describe("parseAddArgs", () => {
     expect(() => parseAddArgs(["--category"], "/repo")).toThrow(CliError);
   });
 
+  it("parses --from-json without a repo positional", () => {
+    const args = parseAddArgs(["--from-json", "/tmp/candidates.json"], "/repo");
+    expect(args).toMatchObject({ fromJson: "/tmp/candidates.json", root: "/repo", repo: "" });
+  });
+
+  it("rejects a repo positional alongside --from-json and a dangling --from-json", () => {
+    expect(() => parseAddArgs(["--from-json", "/tmp/c.json", "owner/repo"], "/repo")).toThrow(CliError);
+    expect(() => parseAddArgs(["--from-json"], "/repo")).toThrow(CliError);
+  });
+
   it("exposes usage text through the same path as the error", () => {
     expect(addUsage()).toMatch(/^Usage: agentx add owner\/repo --category <slug>/);
+    expect(addUsage()).toContain("--from-json <file>");
   });
 });
 

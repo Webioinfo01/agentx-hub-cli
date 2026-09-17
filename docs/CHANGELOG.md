@@ -1,11 +1,29 @@
 # Changelog
 
+## v0.1.2
+
+Batch intake from the literature pipeline, and an explicit awescholar
+compatibility gate.
+
+### Highlights
+
+- `agentx add --from-json <file>` — batch intake of an
+  `awescholar render agentx` candidate file (snapshot-shaped
+  `{"agents": [...]}` or a bare record array). The file is data, not
+  decisions: every record passes the same category/tag validation and one
+  live GitHub fetch (stale metrics in the file are ignored),
+  already-registered repos are skipped with a notice, and the batch is
+  all-or-nothing — nothing is written unless every new record passes.
+- awescholar compatibility is detected by output shape, not version
+  strings: search records missing the `authors`/`citations` keys (installs
+  older than 0.2.2) fail with a `pip install -U "awescholar>=0.2.2"` hint,
+  and a missing binary now raises the same hint as a CliError — no silent
+  degradation in `snapshot`, `enrich-papers`, or `refresh-citations`.
+
 ## v0.1.1
 
 Rename the npm package to `agentx-hub-cli` (unscoped) for consistency with
 the project's other tooling. The CLI entry remains `agentx`.
-
-# Changelog
 
 ## v0.1.0
 

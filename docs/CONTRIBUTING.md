@@ -57,7 +57,9 @@ test/                  One test file per module + the CI fixture repo
   the website checkout (CI does this) is the drift detector.
 - Commands that talk to Python's awescholar (`snapshot`, `enrich-papers`,
   `refresh-citations`) fail with an install hint when the CLI is missing —
-  they never degrade silently.
+  they never degrade silently. The minimum is 0.2.2, enforced by output
+  shape: search records without the `authors`/`citations` keys are rejected
+  with `pip install -U "awescholar>=0.2.2"`.
 
 ## Release
 

@@ -66,6 +66,19 @@ agentx add owner/repo --category bio-omics --tags "Stanford,Nature-Biotechnology
 GitHub, fetches live metrics once, and appends the record in stable slug
 order. Finish with `agentx validate`, then commit the snapshot.
 
+For batch intake from a literature pipeline, `awescholar render agentx`
+exports papers with GitHub repos as a candidate file; ingest it with:
+
+```bash
+agentx add --from-json candidates.json
+# Added 3 agents from candidates.json: ...
+```
+
+The candidate file is data, not decisions: every record goes through the same
+category/tag validation and a live GitHub fetch (stale metrics in the file are
+ignored), already-registered repos are skipped with a notice, and the batch is
+all-or-nothing — nothing is written unless every new record passes.
+
 ## Config
 
 No config file. Options come from flags and the environment:
@@ -74,7 +87,7 @@ No config file. Options come from flags and the environment:
 |---|---|---|
 | `GITHUB_TOKEN` | `add`, `snapshot` | Raises the GitHub API limit from 60 to 5,000 req/h |
 | `SEMANTICSCHOLAR_API_KEY` | `enrich-papers`, `refresh-citations` | Avoids anonymous Semantic Scholar rate limits |
-| `awescholar` on PATH | `snapshot`, `enrich-papers`, `refresh-citations` | Bulk GitHub refresh and paper lookups (`pip install awescholar`) |
+| `awescholar` on PATH (>= 0.2.2) | `snapshot`, `enrich-papers`, `refresh-citations` | Bulk GitHub refresh and paper lookups (`pip install -U "awescholar>=0.2.2"`); older installs are rejected by an output-shape check |
 
 Every command accepts `--root <dir>` — the AgentX repository to operate on,
 default: the current directory.
@@ -84,6 +97,7 @@ default: the current directory.
 ```bash
 agentx add owner/repo --category <slug> [--name "Foo"] [--tags "A,B"]
 agentx add owner/repo --paper <url> [--homepage <url>] [--description "txt"]
+agentx add --from-json <candidates.json from awescholar render agentx>
 agentx validate
 agentx snapshot
 agentx enrich-papers [--force] [--only <slug-substring>]
