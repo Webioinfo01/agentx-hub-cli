@@ -7,7 +7,7 @@
     <a href="./README_cn.md">简体中文</a>
   </p>
   <p>
-    <img src="https://img.shields.io/badge/version-0.1.0-7C3AED?style=flat-square" alt="Version">
+    <img src="https://img.shields.io/badge/version-0.1.2-7C3AED?style=flat-square" alt="Version">
     <img src="https://img.shields.io/badge/node-%E2%89%A520-0EA5E9?style=flat-square" alt="Node">
   </p>
   <p>
@@ -18,6 +18,8 @@
     <img src="https://img.shields.io/github/stars/Webioinfo01/agentx-hub-cli?style=flat-square" alt="GitHub stars">
   </p>
 </div>
+
+> **Deprecated.** agentx-cli has been absorbed into [awescholar](https://github.com/wehuman01/awescholar) v0.2.6 (Python). Use `awescholar updater add --agentx`, `awescholar updater enrich --agentx`, `awescholar updater backfill --agentx`, and `awescholar verify --agentx` instead — see awescholar's README for the command mapping. This repo is frozen and receives no further changes.
 
 > Maintain an AgentX research-agent registry from the terminal.
 

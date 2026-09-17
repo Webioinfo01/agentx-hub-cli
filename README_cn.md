@@ -7,17 +7,19 @@
     <strong>简体中文</strong>
   </p>
   <p>
-    <img src="https://img.shields.io/badge/version-0.1.0-7C3AED?style=flat-square" alt="Version">
+    <img src="https://img.shields.io/badge/version-0.1.2-7C3AED?style=flat-square" alt="Version">
     <img src="https://img.shields.io/badge/node-%E2%89%A520-0EA5E9?style=flat-square" alt="Node">
   </p>
   <p>
     <img src="https://img.shields.io/badge/status-alpha-c96a3d?style=flat-square" alt="Status">
     <img src="https://img.shields.io/badge/install-npm-22C55E?style=flat-square" alt="npm install">
     <img src="https://img.shields.io/badge/platform-terminal-334155?style=flat-square" alt="Platform">
-    <img src="https://img.shields.io/npm/dm/%40mugpeng/agentx-cli?style=flat-square" alt="npm downloads">
+    <img src="https://img.shields.io/npm/dm/agentx-hub-cli?style=flat-square" alt="npm downloads">
     <img src="https://img.shields.io/github/stars/Webioinfo01/agentx-hub-cli?style=flat-square" alt="GitHub stars">
   </p>
 </div>
+
+> **已弃用。** agentx-cli 已并入 [awescholar](https://github.com/wehuman01/awescholar) v0.2.6（Python 版）。请改用 `awescholar updater add --agentx`、`awescholar updater enrich --agentx`、`awescholar updater backfill --agentx` 和 `awescholar verify --agentx` —— 命令对照见 awescholar 的 README。本仓库已冻结，不再接受任何更改。
 
 > 在终端维护 AgentX 研究 Agent 注册表。
 
