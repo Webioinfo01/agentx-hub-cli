@@ -65,15 +65,15 @@ test/                  One test file per module + the CI fixture repo
   first. Update it in the same PR as the behavior change.
 - Publishing uses npm **trusted publishing** (OIDC) — no npm token is stored
   anywhere. One-time setup:
-  1. On npmjs.com, create the `webioinfo` organization (free plan) if it
-     does not exist — the `@webioinfo` scope resolves to this org.
-  2. On npmjs.com, pre-register the package with a trusted publisher:
-     package name `@webioinfo/agentx-cli`, GitHub repo
-     `Webioinfo01/agentx-cli`, workflow filename `release.yml`, environment
-     `npm`.
-  3. On GitHub, create the `npm` environment in this repo (Settings →
-     Environments → New environment), optionally with a `v*` tag protection
-     rule so only tag builds can publish.
+  1. On npmjs.com, pre-register the package with a trusted publisher:
+     package name `@mugpeng/agentx-cli` (the `@mugpeng` scope is the
+     personal npm account), GitHub repo `Webioinfo01/agentx-cli`, workflow
+     filename `release.yml`, environment `npm`. The GitHub owner and the
+     npm scope are independent — the publisher matches on the repository,
+     not on the package name.
+  2. On GitHub, the `npm` environment exists in this repo (Settings →
+     Environments), optionally with a `v*` tag protection rule so only tag
+     builds can publish.
 - Cut a release: bump `version` in `package.json`, add the matching
   `## vX.Y.Z` changelog section, commit, then
   `git tag vX.Y.Z && git push --tags`. The workflow builds, tests, publishes

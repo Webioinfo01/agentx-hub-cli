@@ -1,5 +1,5 @@
 {
-  "name": "@webioinfo/agentx-cli",
+  "name": "@mugpeng/agentx-cli",
   "version": "0.1.0",
   "description": "Standalone CLI for the AgentX research-agent registry: add agents, refresh GitHub metrics, and validate the registry snapshot.",
   "license": "MPL-2.0",
