@@ -66,7 +66,7 @@ test/                  One test file per module + the CI fixture repo
 - Publishing uses npm **trusted publishing** (OIDC) — no npm token is stored
   anywhere. One-time setup:
   1. On npmjs.com, pre-register the package with a trusted publisher:
-     package name `agentx-hub-cli`, GitHub repo `Webioinfo01/agentx-cli`,
+     package name `agentx-hub-cli`, GitHub repo `Webioinfo01/agentx-hub-cli`,
      workflow filename `release.yml`, environment `npm`.
   2. On GitHub, the `npm` environment exists in this repo (Settings →
      Environments), optionally with a `v*` tag protection rule so only tag

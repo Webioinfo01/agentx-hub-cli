@@ -15,7 +15,7 @@
     <img src="https://img.shields.io/badge/install-npm-22C55E?style=flat-square" alt="npm install">
     <img src="https://img.shields.io/badge/platform-terminal-334155?style=flat-square" alt="Platform">
     <img src="https://img.shields.io/npm/dm/%40mugpeng/agentx-cli?style=flat-square" alt="npm downloads">
-    <img src="https://img.shields.io/github/stars/Webioinfo01/agentx-cli?style=flat-square" alt="GitHub stars">
+    <img src="https://img.shields.io/github/stars/Webioinfo01/agentx-hub-cli?style=flat-square" alt="GitHub stars">
   </p>
 </div>
 
@@ -44,8 +44,8 @@ npx agentx-hub-cli --help
 从源码运行：
 
 ```bash
-git clone https://github.com/Webioinfo01/agentx-cli
-cd agentx-cli && pnpm install && pnpm build
+git clone https://github.com/Webioinfo01/agentx-hub-cli
+cd agentx-hub-cli && pnpm install && pnpm build
 node dist/cli.js --help   # 或者：npm link  →  agentx
 ```
 

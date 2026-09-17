@@ -31,10 +31,10 @@
   "packageManager": "pnpm@11.24.0",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Webioinfo01/agentx-cli.git"
+    "url": "git+https://github.com/Webioinfo01/agentx-hub-cli.git"
   },
-  "homepage": "https://github.com/Webioinfo01/agentx-cli#readme",
-  "bugs": "https://github.com/Webioinfo01/agentx-cli/issues",
+  "homepage": "https://github.com/Webioinfo01/agentx-hub-cli#readme",
+  "bugs": "https://github.com/Webioinfo01/agentx-hub-cli/issues",
   "keywords": [
     "agentx",
     "research-agents",
