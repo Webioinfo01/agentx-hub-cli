@@ -3,6 +3,7 @@ name: release
 on:
   push:
     tags: ["v*"]
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -30,17 +31,70 @@ jobs:
       - name: Upgrade npm for trusted publishing
         run: npm install -g npm@latest
 
+      # One-off manual run. `npm deprecate` is not covered by npm's OIDC
+      # trusted publishing (only publish is), so this replicates the exact
+      # exchange `npm publish` performs (npm/lib/utils/oidc.js): Actions
+      # OIDC token → short-lived npm token, then deprecate with it.
+      - name: Deprecate every published version (manual dispatch)
+        if: github.event_name == 'workflow_dispatch'
+        run: |
+          node <<'EOF'
+          const { spawnSync } = require('node:child_process')
+
+          const message =
+            'DEPRECATED: absorbed into awescholar (Python) — use awescholar ' +
+            'updater add/enrich/backfill --agentx and awescholar verify ' +
+            '--agentx instead. https://github.com/wehuman01/awescholar'
+
+          async function main() {
+            const audienceUrl = new URL(process.env.ACTIONS_ID_TOKEN_REQUEST_URL)
+            audienceUrl.searchParams.append('audience', 'npm:registry.npmjs.org')
+            const idRes = await fetch(audienceUrl, {
+              headers: {
+                Accept: 'application/json',
+                Authorization: `Bearer ${process.env.ACTIONS_ID_TOKEN_REQUEST_TOKEN}`,
+              },
+            })
+            if (!idRes.ok) throw new Error(`id token request failed: ${idRes.status}`)
+            const idToken = (await idRes.json()).value
+            if (!idToken) throw new Error('missing id token value')
+
+            const exRes = await fetch(
+              'https://registry.npmjs.org/-/npm/v1/oidc/token/exchange/package/agentx-hub-cli',
+              { method: 'POST', headers: { Authorization: `Bearer ${idToken}` } }
+            )
+            const body = await exRes.json().catch(() => ({}))
+            if (!exRes.ok || !body.token) {
+              throw new Error(`token exchange failed: ${exRes.status} ${JSON.stringify(body)}`)
+            }
+            console.log('::add-mask::' + body.token)
+
+            const res = spawnSync('npm', [
+              'deprecate', 'agentx-hub-cli@*', message,
+              `--//registry.npmjs.org/:_authToken=${body.token}`,
+            ], { stdio: 'inherit' })
+            process.exitCode = res.status ?? 1
+          }
+
+          main().catch((err) => { console.error(err.message); process.exit(1) })
+          EOF
+
       - run: pnpm install --frozen-lockfile
+        if: github.event_name == 'push'
 
       - run: pnpm test
+        if: github.event_name == 'push'
       - run: pnpm build
+        if: github.event_name == 'push'
 
       # No token in the environment: npm exchanges the workflow's OIDC token
       # against the trusted-publisher mapping (repo + workflow + environment).
       # Provenance is generated automatically.
       - run: npm publish
+        if: github.event_name == 'push'
 
       - name: GitHub Release from the changelog
+        if: github.event_name == 'push'
         run: |
           version="${GITHUB_REF_NAME#v}"
           awk -v ver="## v$version" '
