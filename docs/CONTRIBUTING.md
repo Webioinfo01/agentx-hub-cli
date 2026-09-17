@@ -63,8 +63,21 @@ test/                  One test file per module + the CI fixture repo
 
 - `docs/CHANGELOG.md` carries one `## vX.Y.Z` section per release, newest
   first. Update it in the same PR as the behavior change.
-- Push a `v*` tag; `.github/workflows/release.yml` builds, tests, publishes
-  to npm (`NPM_TOKEN` secret), and creates the GitHub Release from the
-  changelog section.
+- Publishing uses npm **trusted publishing** (OIDC) — no npm token is stored
+  anywhere. One-time setup:
+  1. On npmjs.com, create the `webioinfo` organization (free plan) if it
+     does not exist — the `@webioinfo` scope resolves to this org.
+  2. On npmjs.com, pre-register the package with a trusted publisher:
+     package name `@webioinfo/agentx-cli`, GitHub repo
+     `Webioinfo01/agentx-cli`, workflow filename `release.yml`, environment
+     `npm`.
+  3. On GitHub, create the `npm` environment in this repo (Settings →
+     Environments → New environment), optionally with a `v*` tag protection
+     rule so only tag builds can publish.
+- Cut a release: bump `version` in `package.json`, add the matching
+  `## vX.Y.Z` changelog section, commit, then
+  `git tag vX.Y.Z && git push --tags`. The workflow builds, tests, publishes
+  through the OIDC exchange (provenance attached automatically), and creates
+  the GitHub Release from the changelog section.
 - Version bumps: patch for fixes, minor for new commands or flags, major for
   snapshot-contract changes.
