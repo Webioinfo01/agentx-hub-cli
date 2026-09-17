@@ -1,0 +1,45 @@
+{
+  "name": "@webioinfo/agentx-cli",
+  "version": "0.1.0",
+  "description": "Standalone CLI for the AgentX research-agent registry: add agents, refresh GitHub metrics, and validate the registry snapshot.",
+  "license": "MPL-2.0",
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "bin": {
+    "agentx": "dist/cli.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup src/cli.ts --format esm --target node20 --out-dir dist --clean",
+    "check": "tsc --noEmit",
+    "test": "vitest run",
+    "prepublishOnly": "pnpm build && pnpm test"
+  },
+  "devDependencies": {
+    "@types/node": "^20",
+    "tsup": "^8",
+    "typescript": "^5",
+    "vitest": "^5"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Webioinfo01/agentx-cli.git"
+  },
+  "homepage": "https://github.com/Webioinfo01/agentx-cli#readme",
+  "bugs": "https://github.com/Webioinfo01/agentx-cli/issues",
+  "keywords": [
+    "agentx",
+    "research-agents",
+    "ai-agents",
+    "registry",
+    "curated-list",
+    "cli"
+  ]
+}
