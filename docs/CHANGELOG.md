@@ -1,5 +1,12 @@
 # Changelog
 
+## v0.1.1
+
+Rename the npm package to `agentx-hub-cli` (unscoped) for consistency with
+the project's other tooling. The CLI entry remains `agentx`.
+
+# Changelog
+
 ## v0.1.0
 
 First release. `agentx` is the standalone operator CLI for an AgentX

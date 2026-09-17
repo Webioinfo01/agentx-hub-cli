@@ -1,6 +1,6 @@
 {
-  "name": "@mugpeng/agentx-cli",
-  "version": "0.1.0",
+  "name": "agentx-hub-cli",
+  "version": "0.1.1",
   "description": "Standalone CLI for the AgentX research-agent registry: add agents, refresh GitHub metrics, and validate the registry snapshot.",
   "license": "MPL-2.0",
   "type": "module",

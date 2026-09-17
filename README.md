@@ -14,7 +14,7 @@
     <img src="https://img.shields.io/badge/status-alpha-c96a3d?style=flat-square" alt="Status">
     <img src="https://img.shields.io/badge/install-npm-22C55E?style=flat-square" alt="npm install">
     <img src="https://img.shields.io/badge/platform-terminal-334155?style=flat-square" alt="Platform">
-    <img src="https://img.shields.io/npm/dm/%40mugpeng/agentx-cli?style=flat-square" alt="npm downloads">
+    <img src="https://img.shields.io/npm/dm/agentx-hub-cli?style=flat-square" alt="npm downloads">
     <img src="https://img.shields.io/github/stars/Webioinfo01/agentx-cli?style=flat-square" alt="GitHub stars">
   </p>
 </div>
@@ -33,13 +33,13 @@ hand-edited; this CLI is the writer.
 ## Install
 
 ```bash
-npm install -g @mugpeng/agentx-cli
+npm install -g agentx-hub-cli
 ```
 
 Or run it without installing:
 
 ```bash
-npx @mugpeng/agentx-cli --help
+npx agentx-hub-cli --help
 ```
 
 From source:

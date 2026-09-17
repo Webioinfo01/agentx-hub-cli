@@ -32,13 +32,13 @@
 ## 安装
 
 ```bash
-npm install -g @mugpeng/agentx-cli
+npm install -g agentx-hub-cli
 ```
 
 免安装直接运行：
 
 ```bash
-npx @mugpeng/agentx-cli --help
+npx agentx-hub-cli --help
 ```
 
 从源码运行：
