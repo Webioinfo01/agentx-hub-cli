@@ -19,7 +19,7 @@
   </p>
 </div>
 
-> **Deprecated.** agentx-cli has been absorbed into [awescholar](https://github.com/wehuman01/awescholar) v0.2.6 (Python). Use `awescholar updater add --agentx`, `awescholar updater enrich --agentx`, `awescholar updater backfill --agentx`, and `awescholar verify --agentx` instead — see awescholar's README for the command mapping. This repo is frozen and receives no further changes.
+> **Deprecated.** agentx-cli has been absorbed into [awescholar](https://github.com/wehuman01/awescholar) (Python). Since awescholar v0.3.0 the package installs the `agentx` command again — `agentx add | enrich | backfill | validate`, pure aliases over the same pipeline (`pip install awescholar`; see awescholar's README for the mapping). This repo is frozen and receives no further changes.
 
 > Maintain an AgentX research-agent registry from the terminal.
 

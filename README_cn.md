@@ -19,7 +19,7 @@
   </p>
 </div>
 
-> **已弃用。** agentx-cli 已并入 [awescholar](https://github.com/wehuman01/awescholar) v0.2.6（Python 版）。请改用 `awescholar updater add --agentx`、`awescholar updater enrich --agentx`、`awescholar updater backfill --agentx` 和 `awescholar verify --agentx` —— 命令对照见 awescholar 的 README。本仓库已冻结，不再接受任何更改。
+> **已弃用。** agentx-cli 已并入 [awescholar](https://github.com/wehuman01/awescholar)（Python 版）。自 awescholar v0.3.0 起，该包重新提供 `agentx` 命令 —— `agentx add | enrich | backfill | validate`，同一流水线的纯别名（`pip install awescholar`，命令对照见其 README）。本仓库已冻结，不再接受任何更改。
 
 > 在终端维护 AgentX 研究 Agent 注册表。
 
