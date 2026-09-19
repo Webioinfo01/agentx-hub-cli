@@ -27,39 +27,32 @@ single bundled file on the Node standard library.
 
 ```
 src/
-  cli.ts               Entry: verb dispatch, help/version, global --root
+  cli.ts               Entry: verb dispatch, help/version
   commands/            One file per verb; owns its flags and output
-  lib/                 Registry policy and I/O clients, no CLI coupling
-    categories.ts      Category slugs + lifecycle thresholds
-    tags.ts            Tag policy denylist, TAG_TYPE registry, venue aliases
-    transform.ts       Status/retirement/license resolution (pure)
-    papers.ts          Paper clue extraction and title matching (pure)
-    snapshot.ts        Snapshot types, read/write, slugs
-    snapshot-validate.ts  The writer invariants, as one pure checker
-    github.ts / scholar.ts  REST and awescholar CLI clients
-test/                  One test file per module + the CI fixture repo
+  lib/
+    website.ts         Resolve the hub website checkout (--dir / env, markers)
+    dispatch.ts        GitHub Actions workflow dispatch (fetch, no deps)
+    pnpm.ts            Run a pnpm script in the website checkout
+    cli-error.ts       User-facing error type; cli.ts prints and exits 1
+test/                  One test file per module
 ```
 
-## The snapshot contract
+## The operations contract
 
-- `data/agents-snapshot.json` under the `--root` directory is the only thing
-  this CLI reads and writes. Writers sort agents by slug, keep the file
-  timestamp-free, and set `counts.total`.
-- `src/lib/snapshot-validate.ts` is the machine-checkable statement of "the
-  snapshot is never hand-edited": shape, slug order and uniqueness, unique
-  repos, registered categories and tags, canonical `githubUrl`, status
-  vocabulary, graveyard metadata placement, `paperMeta` field types.
-- The registry policy (categories, tag registry, venue aliases, status
-  rules) is mirrored from the [agentx-hub](https://github.com/Webioinfo01/agentx-hub)
-  website, which enforces the same rules over its own copy. **A policy change
-  must land in both repos in the same change.** Until the website consumes
-  the published package, neither side is "ahead"; `agentx validate` against
-  the website checkout (CI does this) is the drift detector.
-- Commands that talk to Python's awescholar (`snapshot`, `enrich-papers`,
-  `refresh-citations`) fail with an install hint when the CLI is missing —
-  they never degrade silently. The minimum is 0.2.2, enforced by output
-  shape: search records without the `authors`/`citations` keys are rejected
-  with `pip install -U "awescholar>=0.2.2"`.
+- The apply/moderation logic lives in the hub website repo and never here:
+  local commands (`sync`, `moderate`) run the website checkout's own pnpm
+  scripts (`db:apply-snapshot`, `reviews:moderate`), so the Prisma-coupled
+  reconcile stays a single implementation shared with the server's boot
+  apply. This CLI is a dispatcher, not a re-implementation.
+- Dispatch commands (`sync --remote`, `mirror`) trigger the hub repo's
+  `sync-db.yml` / `sync-public.yml` workflows — same code, run with the
+  repository's secrets. The workflow filenames and the default hub repo
+  (`Webioinfo01/agentx-hub-dev`) are the contract with the website repo;
+  renaming either is a breaking change.
+- Registry curation (add/enrich/backfill/validate over
+  `data/agents-snapshot.json`) is not this CLI's job — it lives in
+  [awescholar](https://github.com/wehuman01/awescholar)
+  (`updater add/enrich/backfill --agentx`, `verify --agentx`).
 
 ## Release
 
@@ -79,4 +72,4 @@ test/                  One test file per module + the CI fixture repo
   through the OIDC exchange (provenance attached automatically), and creates
   the GitHub Release from the changelog section.
 - Version bumps: patch for fixes, minor for new commands or flags, major for
-  snapshot-contract changes.
+  contract changes (workflow filenames, default hub repo, flag removals).
