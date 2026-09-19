@@ -1,13 +1,13 @@
 <div align="center">
-  <h1>agentx: AgentX 注册表命令行</h1>
-  <p><strong>在终端维护 AgentX 研究 Agent 注册表。</strong></p>
-  <p>按校验流水线添加研究 AI Agent，刷新指标，保持注册表有效。</p>
+  <h1>agentx：AgentX Hub 运维命令行</h1>
+  <p><strong>在终端运维 AgentX Hub。</strong></p>
+  <p>把注册表快照落进 Hub 数据库、审核评价、镜像到公共 Hub。</p>
   <p>
     <a href="./README.md">English</a> ·
     <strong>简体中文</strong>
   </p>
   <p>
-    <img src="https://img.shields.io/badge/version-0.1.2-7C3AED?style=flat-square" alt="Version">
+    <img src="https://img.shields.io/badge/version-0.2.0-7C3AED?style=flat-square" alt="Version">
     <img src="https://img.shields.io/badge/node-%E2%89%A520-0EA5E9?style=flat-square" alt="Node">
   </p>
   <p>
@@ -19,17 +19,18 @@
   </p>
 </div>
 
-> **已弃用。** agentx-cli 已并入 [awescholar](https://github.com/wehuman01/awescholar)（Python 版）。自 awescholar v0.3.0 起，该包重新提供 `agentx` 命令 —— `agentx add | enrich | backfill | validate`，同一流水线的纯别名（`pip install awescholar`，命令对照见其 README）。本仓库已冻结，不再接受任何更改。
+> **v0.2.0 —— 新使命。** v0.1.x 的注册表策展命令已并入
+> [awescholar](https://github.com/wehuman01/awescholar)（Python 版）：
+> `awescholar updater add | enrich | backfill --agentx` 和
+> `awescholar verify --agentx`。本 CLI 现在是 Hub **运维**补充——
+> 承载那些必须接触 Hub 网站或其部署环境的命令，通用策展工具箱管不了它们。
 
-> 在终端维护 AgentX 研究 Agent 注册表。
+> 两个工具，一条边界：
 
-`agentx` 作用于一个 AgentX 仓库检出——即包含
-`data/agents-snapshot.json` 的目录，也就是
-[agentx-hub](https://github.com/Webioinfo01/agentx-hub) 背后的策展注册表。
-它按校验流水线添加新 Agent（分类检查、标签政策、一次 GitHub 实时抓取），
-刷新 GitHub 指标和生命周期状态，通过
-[awescholar](https://github.com/Webioinfo01/awescholar) 补全论文元数据，
-离线校验写入不变量。快照文件从不手改；这个 CLI 就是写入方。
+| 职责 | 归属 | 原因 |
+|---|---|---|
+| 注册表策展（`data/agents-snapshot.json`） | [awescholar](https://github.com/wehuman01/awescholar)（pip） | 通用：任何 AgentX 检出都能用，与文献流水线共享 |
+| Hub 运维（数据库、评价、公共镜像） | **本 CLI**（npm） | 与 Hub 网站的脚本和 workflow 耦合——只做包装，绝不重新实现 |
 
 ## 安装
 
@@ -51,32 +52,25 @@ cd agentx-hub-cli && pnpm install && pnpm build
 node dist/cli.js --help   # 或者：npm link  →  agentx
 ```
 
-## 快速开始
+## 命令
 
 ```bash
-cd /path/to/agentx-hub
-
-agentx validate
-# Snapshot OK: 208 agents, counts consistent.
-
-agentx add owner/repo --category bio-omics --tags "Stanford,Nature-Biotechnology"
-# Added owner-repo (owner/repo) → category bio-omics, tags: Stanford, Nature-Biotechnology
+agentx sync [--remote] [--dir <website>] [--repo <repo>] [--ref <ref>]
+agentx moderate [--dir <website>] [--approve <id> | --reject <id>]
+agentx mirror [--repo <repo>] [--ref <ref>]
 ```
 
-`agentx add` 校验分类和标签政策，要求仓库在 GitHub 上存在，抓取一次实时
-指标，按稳定 slug 顺序追加记录。之后运行 `agentx validate`，再提交快照。
-
-从文献流水线批量录入时，`awescholar render agentx` 会把带 GitHub 仓库的
-论文导出为候选文件，用下面的命令摄入：
-
-```bash
-agentx add --from-json candidates.json
-# Added 3 agents from candidates.json: ...
-```
-
-候选文件是数据而不是决定：每条记录都走同样的分类/标签校验和一次实时
-GitHub 拉取（文件里的陈旧指标一律忽略），已注册的仓库跳过并提示，整批
-all-or-nothing——任何一条新记录不过，就什么都不写。
+- **`sync`** —— 把 `data/agents-snapshot.json` 落进 Hub 数据库。本地模式
+  （默认）运行网站检出里的 `db:apply-snapshot`（与 Prisma schema 耦合的
+  reconcile，和 server 启动时的自动 apply 共享同一份实现——永远只有一份
+  实现）。`--remote` 则派发 Hub 仓库的 `sync-db` workflow：同样的代码，
+  用仓库的生产 secrets 运行，不需要本地检出。
+- **`moderate`** —— 操作待审核的 verified-run 评价队列。裸 `agentx
+  moderate` 列出队列；`--approve/--reject <id>` 做裁定。纯透传到网站的
+  `reviews:moderate` 脚本。
+- **`mirror`** —— 派发 Hub 仓库的 `sync-public` workflow：把面向用户的
+  内容按允许清单桥接到公共
+  [agentx-hub](https://github.com/Webioinfo01/agentx-hub) 仓库。
 
 ## 配置
 
@@ -84,29 +78,9 @@ all-or-nothing——任何一条新记录不过，就什么都不写。
 
 | 变量 | 使用者 | 作用 |
 |---|---|---|
-| `GITHUB_TOKEN` | `add`、`snapshot` | GitHub API 限额从 60 提到 5,000 次/小时 |
-| `SEMANTICSCHOLAR_API_KEY` | `enrich-papers`、`refresh-citations` | 避开 Semantic Scholar 匿名限流 |
-| PATH 上的 `awescholar`（>= 0.2.2） | `snapshot`、`enrich-papers`、`refresh-citations` | 批量 GitHub 刷新和论文查询（`pip install -U "awescholar>=0.2.2"`）；过旧的安装会被输出形状检查拒绝 |
-
-所有命令都接受 `--root <dir>`——目标 AgentX 仓库，默认当前目录。
-
-## 命令
-
-```bash
-agentx add owner/repo --category <slug> [--name "Foo"] [--tags "A,B"]
-agentx add owner/repo --paper <url> [--homepage <url>] [--description "txt"]
-agentx add --from-json <awescholar render agentx 导出的 candidates.json>
-agentx validate
-agentx snapshot
-agentx enrich-papers [--force] [--only <slug-substring>]
-agentx refresh-citations
-```
-
-分类 slug：`autonomous-research`、`literature-writing`、`bio-omics`、
-`chem-drug`、`clinical-health`、`platforms`、`orchestration`、`benchmarks`、
-`safety-security`、`others`。标签只承载客观专有名词——机构、发表渠道、
-团队、命名的技术；其余一律拒绝。单个命令的选项看
-`agentx <command> --help`。
+| `AGENTX_WEBSITE_DIR` | `sync`、`moderate` | 本地命令的默认 Hub 网站检出（不默认当前目录） |
+| `AGENTX_HUB_REPO` | `sync --remote`、`mirror` | 默认 Hub 仓库（缺省 `Webioinfo01/agentx-hub-dev`） |
+| `GITHUB_TOKEN`（或 `GH_TOKEN`） | `sync --remote`、`mirror` | 派发鉴权 |
 
 ## 开发
 
@@ -117,8 +91,7 @@ pnpm check   # tsc --noEmit
 pnpm build   # tsup → dist/cli.js
 ```
 
-贡献指南、快照契约和发布流程见
-[docs/CONTRIBUTING.md](./docs/CONTRIBUTING.md)。
+贡献指南和发布流程见 [docs/CONTRIBUTING.md](./docs/CONTRIBUTING.md)。
 
 ## 许可证
 

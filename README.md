@@ -1,13 +1,13 @@
 <div align="center">
-  <h1>agentx: AgentX Registry CLI</h1>
-  <p><strong>Maintain an AgentX research-agent registry from the terminal.</strong></p>
-  <p>Add research AI agents with live GitHub metrics, refresh the registry, and keep it valid.</p>
+  <h1>agentx: AgentX Hub Operations CLI</h1>
+  <p><strong>Operate the AgentX hub from the terminal.</strong></p>
+  <p>Sync the registry snapshot into the hub database, moderate reviews, mirror to the public hub.</p>
   <p>
     <strong>English</strong> ·
     <a href="./README_cn.md">简体中文</a>
   </p>
   <p>
-    <img src="https://img.shields.io/badge/version-0.1.2-7C3AED?style=flat-square" alt="Version">
+    <img src="https://img.shields.io/badge/version-0.2.0-7C3AED?style=flat-square" alt="Version">
     <img src="https://img.shields.io/badge/node-%E2%89%A520-0EA5E9?style=flat-square" alt="Node">
   </p>
   <p>
@@ -19,18 +19,19 @@
   </p>
 </div>
 
-> **Deprecated.** agentx-cli has been absorbed into [awescholar](https://github.com/wehuman01/awescholar) (Python). Since awescholar v0.3.0 the package installs the `agentx` command again — `agentx add | enrich | backfill | validate`, pure aliases over the same pipeline (`pip install awescholar`; see awescholar's README for the mapping). This repo is frozen and receives no further changes.
+> **v0.2.0 — new mission.** The v0.1.x registry-curation commands moved into
+> [awescholar](https://github.com/wehuman01/awescholar) (Python):
+> `awescholar updater add | enrich | backfill --agentx` and
+> `awescholar verify --agentx`. This CLI is now the hub **operations**
+> supplement — the commands that need the hub website or its deployments,
+> which a generic curation toolkit cannot own.
 
-> Maintain an AgentX research-agent registry from the terminal.
+> Two tools, one boundary:
 
-`agentx` operates on an AgentX repository checkout — a directory holding
-`data/agents-snapshot.json`, the curated registry behind
-[agentx-hub](https://github.com/Webioinfo01/agentx-hub). It adds new agents
-through the validated pipeline (category check, tag policy, one live GitHub
-fetch), refreshes GitHub metrics and lifecycle statuses, fills companion-paper
-metadata via [awescholar](https://github.com/Webioinfo01/awescholar), and
-validates the writer invariants offline. The snapshot file is never
-hand-edited; this CLI is the writer.
+| Concern | Lives in | Why |
+|---|---|---|
+| Registry curation (`data/agents-snapshot.json`) | [awescholar](https://github.com/wehuman01/awescholar) (pip) | Generic: works on any AgentX checkout, shared with the literature pipeline |
+| Hub operations (database, reviews, public mirror) | **this CLI** (npm) | Coupled to the hub website's scripts and workflows — it wraps them, never reimplements them |
 
 ## Install
 
@@ -52,34 +53,26 @@ cd agentx-hub-cli && pnpm install && pnpm build
 node dist/cli.js --help   # or: npm link  →  agentx
 ```
 
-## Quick Start
+## Commands
 
 ```bash
-cd /path/to/agentx-hub
-
-agentx validate
-# Snapshot OK: 208 agents, counts consistent.
-
-agentx add owner/repo --category bio-omics --tags "Stanford,Nature-Biotechnology"
-# Added owner-repo (owner/repo) → category bio-omics, tags: Stanford, Nature-Biotechnology
+agentx sync [--remote] [--dir <website>] [--repo <repo>] [--ref <ref>]
+agentx moderate [--dir <website>] [--approve <id> | --reject <id>]
+agentx mirror [--repo <repo>] [--ref <ref>]
 ```
 
-`agentx add` validates the category and tag policy, must find the repo on
-GitHub, fetches live metrics once, and appends the record in stable slug
-order. Finish with `agentx validate`, then commit the snapshot.
-
-For batch intake from a literature pipeline, `awescholar render agentx`
-exports papers with GitHub repos as a candidate file; ingest it with:
-
-```bash
-agentx add --from-json candidates.json
-# Added 3 agents from candidates.json: ...
-```
-
-The candidate file is data, not decisions: every record goes through the same
-category/tag validation and a live GitHub fetch (stale metrics in the file are
-ignored), already-registered repos are skipped with a notice, and the batch is
-all-or-nothing — nothing is written unless every new record passes.
+- **`sync`** — land `data/agents-snapshot.json` in the hub database. Local
+  mode (default) runs the website checkout's own `db:apply-snapshot`
+  (Prisma-coupled reconcile, shared with the server's boot apply — exactly
+  one implementation). `--remote` dispatches the hub repo's `sync-db`
+  workflow instead: same code, run with the repository's production
+  secrets, no local checkout needed.
+- **`moderate`** — operate the pending verified-run review queue. Bare
+  `agentx moderate` lists it; `--approve/--reject <id>` decides. Pure
+  passthrough to the website's `reviews:moderate` script.
+- **`mirror`** — dispatch the hub repo's `sync-public` workflow: the
+  allowlisted bridge that mirrors user-facing content to the public
+  [agentx-hub](https://github.com/Webioinfo01/agentx-hub) repo.
 
 ## Config
 
@@ -87,30 +80,9 @@ No config file. Options come from flags and the environment:
 
 | Variable | Used by | What it does |
 |---|---|---|
-| `GITHUB_TOKEN` | `add`, `snapshot` | Raises the GitHub API limit from 60 to 5,000 req/h |
-| `SEMANTICSCHOLAR_API_KEY` | `enrich-papers`, `refresh-citations` | Avoids anonymous Semantic Scholar rate limits |
-| `awescholar` on PATH (>= 0.2.2) | `snapshot`, `enrich-papers`, `refresh-citations` | Bulk GitHub refresh and paper lookups (`pip install -U "awescholar>=0.2.2"`); older installs are rejected by an output-shape check |
-
-Every command accepts `--root <dir>` — the AgentX repository to operate on,
-default: the current directory.
-
-## Commands
-
-```bash
-agentx add owner/repo --category <slug> [--name "Foo"] [--tags "A,B"]
-agentx add owner/repo --paper <url> [--homepage <url>] [--description "txt"]
-agentx add --from-json <candidates.json from awescholar render agentx>
-agentx validate
-agentx snapshot
-agentx enrich-papers [--force] [--only <slug-substring>]
-agentx refresh-citations
-```
-
-Category slugs: `autonomous-research`, `literature-writing`, `bio-omics`,
-`chem-drug`, `clinical-health`, `platforms`, `orchestration`, `benchmarks`,
-`safety-security`, `others`. Tags carry objective proper-noun attributions
-only — institution, venue, team, named tech; the CLI rejects anything else.
-Run `agentx <command> --help` for a command's options.
+| `AGENTX_WEBSITE_DIR` | `sync`, `moderate` | Default hub website checkout for local commands (no silent cwd default) |
+| `AGENTX_HUB_REPO` | `sync --remote`, `mirror` | Default hub repo (default: `Webioinfo01/agentx-hub-dev`) |
+| `GITHUB_TOKEN` (or `GH_TOKEN`) | `sync --remote`, `mirror` | Dispatch authentication |
 
 ## Development
 
@@ -121,7 +93,7 @@ pnpm check   # tsc --noEmit
 pnpm build   # tsup → dist/cli.js
 ```
 
-Contributing, the snapshot contract, and the release flow live in
+Contributing and the release flow live in
 [docs/CONTRIBUTING.md](./docs/CONTRIBUTING.md).
 
 ## License

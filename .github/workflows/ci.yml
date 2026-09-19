@@ -33,5 +33,7 @@ jobs:
 
       - run: pnpm build
 
-      - name: Smoke — the built CLI validates the fixture repo
-        run: node dist/cli.js validate --root test/fixtures/demo-repo
+      - name: Smoke — the built CLI prints help and rejects unknown verbs
+        run: |
+          node dist/cli.js --help
+          ! node dist/cli.js snapshot

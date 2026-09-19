@@ -1,7 +1,7 @@
 {
   "name": "agentx-hub-cli",
-  "version": "0.1.2",
-  "description": "DEPRECATED: absorbed into awescholar v0.2.6 (Python) — use awescholar updater add/enrich/backfill --agentx and awescholar verify --agentx instead.",
+  "version": "0.2.0",
+  "description": "Operator CLI for the AgentX hub: sync the registry snapshot into the hub database, moderate verified-run reviews, mirror to the public hub. Registry curation lives in awescholar (pip).",
   "license": "MPL-2.0",
   "type": "module",
   "engines": {
@@ -40,7 +40,8 @@
     "research-agents",
     "ai-agents",
     "registry",
-    "curated-list",
+    "hub",
+    "operations",
     "cli"
   ]
 }

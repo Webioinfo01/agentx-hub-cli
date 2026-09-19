@@ -1,5 +1,30 @@
 # Changelog
 
+## v0.2.0
+
+Reborn with a new mission: hub **operations**. The v0.1.x registry-curation
+commands stay in [awescholar](https://github.com/wehuman01/awescholar)
+(`awescholar updater add | enrich | backfill --agentx`,
+`awescholar verify --agentx`); this CLI is now the operations supplement —
+the commands that need the hub website or its deployments. Every command
+wraps the website's own script or workflow; nothing is reimplemented.
+
+### Highlights
+
+- `agentx sync [--remote]` — land `data/agents-snapshot.json` in the hub
+  database. Local mode runs the website checkout's `db:apply-snapshot`
+  (the same Prisma-coupled reconcile the server's boot apply uses);
+  `--remote` dispatches the hub repo's `sync-db` workflow with its
+  production secrets.
+- `agentx moderate [--approve <id> | --reject <id>]` — operate the pending
+  verified-run review queue; bare invocation lists it. Passthrough to the
+  website's `reviews:moderate` script.
+- `agentx mirror` — dispatch the hub repo's `sync-public` workflow, the
+  allowlisted bridge to the public agentx-hub repo.
+- Config by environment: `AGENTX_WEBSITE_DIR` (local checkout),
+  `AGENTX_HUB_REPO` (dispatch target), `GITHUB_TOKEN`/`GH_TOKEN`
+  (dispatch auth). Zero runtime dependencies.
+
 ## v0.1.2
 
 Final release — the package is deprecated; the registry commands now live
